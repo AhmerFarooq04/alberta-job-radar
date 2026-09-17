@@ -5,6 +5,7 @@ defaults:
   country: Canada
   priority: alberta
   request_delay_seconds: 2
+  include_internships: true
 
 companies:
   #Edmonton and Northern Alberta

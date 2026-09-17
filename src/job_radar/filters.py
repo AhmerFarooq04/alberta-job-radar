@@ -365,6 +365,14 @@ CLEARLY_UNRELATED_TITLE_TERMS = (
     "talent network",
     "join our network",
     "want to work with us",
+
+    # Physical-space design.
+    "interior designer",
+    "interior design",
+    "interior decorator",
+    "interior decoration",
+    "landscape designer",
+    "landscape architect",
 )
 
 
