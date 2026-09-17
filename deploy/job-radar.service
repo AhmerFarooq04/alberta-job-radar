@@ -1,0 +1,11 @@
+[Unit]
+Description=Job Radar daily discovery, scoring and notifications
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/alberta-job-radar
+ExecStart=/usr/bin/bash /opt/alberta-job-radar/run.sh
+TimeoutStartSec=infinity

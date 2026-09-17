@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+.venv
+venv
+.pytest_cache
+**/__pycache__
+**/*.pyc
+**/*.egg-info
+**/node_modules
+**/dist
+data
+logs
+tests
+*.zip

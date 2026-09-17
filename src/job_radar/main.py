@@ -11,52 +11,28 @@ from job_radar.matcher import (
     load_resumes,
     process_pending_jobs,
 )
-from job_radar.pipeline import (
-    CompanyRunResult,
-    run_pipeline,
+from job_radar.notifications.telegram import (
+    NotificationResult,
+    TelegramNotifier,
+    notify_pending_jobs,
 )
+from job_radar.pipeline import CompanyRunResult, run_pipeline
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description=(
-            "Scrape, store and score company jobs."
-        )
+        description="Scrape, store, score and notify company jobs."
     )
-
+    parser.add_argument("--commit", action="store_true")
+    parser.add_argument("--match", action="store_true")
+    parser.add_argument("--notify", action="store_true")
     parser.add_argument(
-        "--commit",
-        action="store_true",
-        help="Write results to SQLite.",
+        "--database", type=Path, default=Path("data/job_radar.db")
     )
-
     parser.add_argument(
-        "--match",
-        action="store_true",
-        help="Score pending jobs using Gemini.",
+        "--resumes", type=Path, default=Path("resumes")
     )
-
-    parser.add_argument(
-        "--database",
-        type=Path,
-        default=Path("data/job_radar.db"),
-        help="SQLite database path.",
-    )
-
-    parser.add_argument(
-        "--resumes",
-        type=Path,
-        default=Path("resumes"),
-        help="Resume Markdown directory.",
-    )
-
-    parser.add_argument(
-        "--match-limit",
-        type=int,
-        default=None,
-        help="Maximum Gemini jobs per run.",
-    )
-
+    parser.add_argument("--match-limit", type=int, default=None)
     return parser
 
 
@@ -73,248 +49,148 @@ def print_company_result(
         return
 
     if result.status == "error":
-        print(
-            f"[ERROR] {result.company_name}: "
-            f"{result.error}"
-        )
+        print(f"[ERROR] {result.company_name}: {result.error}")
         return
 
-    matched_count = len(result.matched_jobs)
-
-    status_parts = [
+    parts = [
         f"[SUCCESS] {result.company_name}",
         f"retrieved={result.retrieved_count}",
-        f"prefiltered={matched_count}",
+        f"prefiltered={len(result.matched_jobs)}",
     ]
-
     if committed:
-        baseline_status = (
-            "created"
-            if result.baseline_created
-            else "existing"
-        )
-
-        status_parts.append(
-            f"baseline={baseline_status}"
-        )
-        status_parts.append(
-            f"new={len(result.new_jobs)}"
-        )
-
-    print(" | ".join(status_parts))
+        baseline = "created" if result.baseline_created else "existing"
+        parts.extend([
+            f"baseline={baseline}",
+            f"new={len(result.new_jobs)}",
+        ])
+    print(" | ".join(parts))
 
     for job in result.matched_jobs:
-        posted_value = (
-            job.posted_at
-            or job.posted_text
-            or "Unknown"
-        )
-
         print()
         print(f"    Title:    {job.title}")
         print(f"    Location: {job.location}")
-        print(f"    Posted:   {posted_value}")
-        print(
-            f"    Type:     "
-            f"{job.employment_type}"
-        )
+        print(f"    Posted:   {job.posted_at or job.posted_text or 'Unknown'}")
+        print(f"    Type:     {job.employment_type}")
         print(f"    URL:      {job.job_url}")
-
         if committed:
-            if result.baseline_created:
-                database_status = "baseline"
-            elif job in result.new_jobs:
-                database_status = "new"
-            else:
-                database_status = "known"
-
-            print(
-                f"    Database: {database_status}"
+            state = (
+                "baseline" if result.baseline_created
+                else "new" if job in result.new_jobs
+                else "known"
             )
-
-    if matched_count:
-        print()
+            print(f"    Database: {state}")
 
 
 def main() -> None:
     parser = build_argument_parser()
-    arguments = parser.parse_args()
+    args = parser.parse_args()
 
-    if arguments.match and not arguments.commit:
-        parser.error(
-            "--match requires --commit"
-        )
+    if (args.match or args.notify) and not args.commit:
+        parser.error("--match and --notify require --commit")
 
-    if (
-        arguments.match_limit is not None
-        and arguments.match_limit < 1
-    ):
-        parser.error(
-            "--match-limit must be at least 1"
-        )
+    if args.match_limit is not None and args.match_limit < 1:
+        parser.error("--match-limit must be at least 1")
 
-    started_at = datetime.now().astimezone()
-
-    heading = (
+    print("=" * 72)
+    print(
         "ALBERTA JOB RADAR — DATABASE RUN"
-        if arguments.commit
+        if args.commit
         else "ALBERTA JOB RADAR — DISCOVERY DRY RUN"
     )
+    print(f"Started: {datetime.now().astimezone().isoformat()}")
 
-    print("=" * 72)
-    print(heading)
-    print("=" * 72)
-    print(f"Started: {started_at.isoformat()}")
-    print()
-
-    database: JobDatabase | None = None
-
-    if arguments.commit:
-        database = JobDatabase(
-            arguments.database
-        )
-
-        print("Database writes are enabled.")
-        print(
-            f"Gemini matching: "
-            f"{'enabled' if arguments.match else 'disabled'}"
-        )
-        print(
-            "Notifications are disabled."
-        )
-        print(
-            f"Database: "
-            f"{arguments.database.resolve()}"
-        )
+    if args.commit:
+        print(f"Database: {args.database.resolve()}")
+        print(f"Gemini: {'enabled' if args.match else 'disabled'}")
+        print(f"Telegram: {'enabled' if args.notify else 'disabled'}")
     else:
-        print(
-            "No database writes, Gemini calls, "
-            "or notifications will occur."
-        )
+        print("No database writes, Gemini calls, or notifications.")
 
-    print()
+    database = JobDatabase(args.database) if args.commit else None
+    result = run_pipeline(commit=args.commit, database=database)
 
-    result = run_pipeline(
-        commit=arguments.commit,
-        database=database,
-    )
+    for company_result in result.company_results:
+        print_company_result(company_result, committed=result.committed)
 
-    matching_result: MatchingRunResult | None = None
+    matching = MatchingRunResult(queued=0, succeeded=0, failed=0)
+    notifications = NotificationResult()
+    stage_failed = False
     cleaned_count = 0
 
     if database is not None:
-        if arguments.match:
-            pending_jobs = (
-                database.get_jobs_for_matching(
+        if args.match:
+            try:
+                pending = database.get_jobs_for_matching(
                     retry_errors=True,
-                    limit=arguments.match_limit,
+                    limit=args.match_limit,
                 )
-            )
-
-            if pending_jobs:
-                resumes = load_resumes(
-                    arguments.resumes
-                )
-                matcher = GeminiMatcher()
-
-                try:
-                    matching_result = (
-                        process_pending_jobs(
+                if pending:
+                    resumes = load_resumes(args.resumes)
+                    matcher = GeminiMatcher()
+                    try:
+                        matching = process_pending_jobs(
                             database,
                             matcher,
                             resumes,
                             retry_errors=True,
-                            limit=(
-                                arguments.match_limit
-                            ),
+                            limit=args.match_limit,
                         )
-                    )
+                    finally:
+                        matcher.close()
+            except Exception as error:
+                stage_failed = True
+                print(f"[MATCH STAGE ERROR] {type(error).__name__}")
+
+        if args.notify:
+            try:
+                notifier = TelegramNotifier()
+                try:
+                    notifications = notify_pending_jobs(database, notifier)
                 finally:
-                    matcher.close()
-            else:
-                matching_result = (
-                    MatchingRunResult(
-                        queued=0,
-                        succeeded=0,
-                        failed=0,
-                    )
-                )
+                    notifier.close()
+            except Exception as error:
+                stage_failed = True
+                print(f"[NOTIFICATION STAGE ERROR] {type(error).__name__}")
 
-        cleaned_count = (
-            database.cleanup_old_content(
-                retention_days=30
-            )
-        )
-
-    for company_result in result.company_results:
-        print_company_result(
-            company_result,
-            committed=result.committed,
-        )
+        # Preserve content while jobs are waiting for scoring or retry.
+        if not database.get_jobs_for_matching(retry_errors=True, limit=1):
+            cleaned_count = database.cleanup_old_content(retention_days=30)
 
     print()
     print("=" * 72)
     print("PIPELINE SUMMARY")
     print("=" * 72)
-    print(
-        f"Successful companies: "
-        f"{result.successful_companies}"
-    )
-    print(
-        f"Failed companies:     "
-        f"{result.failed_companies}"
-    )
-    print(
-        f"Skipped companies:    "
-        f"{result.skipped_companies}"
-    )
-    print(
-        f"Jobs retrieved:       "
-        f"{result.total_retrieved}"
-    )
-    print(
-        f"Passed prefilter:      "
-        f"{result.total_matched}"
-    )
+    print(f"Successful companies: {result.successful_companies}")
+    print(f"Failed companies:     {result.failed_companies}")
+    print(f"Skipped companies:    {result.skipped_companies}")
+    print(f"Jobs retrieved:       {result.total_retrieved}")
+    print(f"Passed prefilter:     {result.total_matched}")
 
     if result.committed:
-        print(
-            f"Baselines created:    "
-            f"{result.baselines_created}"
-        )
-        print(
-            f"New jobs discovered:  "
-            f"{result.total_new}"
-        )
-        print(
-            f"Database run ID:      "
-            f"{result.database_run_id}"
-        )
-        print(
-            f"Old content cleaned:  "
-            f"{cleaned_count}"
-        )
+        print(f"Baselines created:    {result.baselines_created}")
+        print(f"New jobs discovered:  {result.total_new}")
+        print(f"Database run ID:      {result.database_run_id}")
+        print(f"Old content cleaned:  {cleaned_count}")
 
-    if matching_result is not None:
-        print(
-            f"Gemini jobs queued:   "
-            f"{matching_result.queued}"
-        )
-        print(
-            f"Gemini jobs scored:   "
-            f"{matching_result.succeeded}"
-        )
-        print(
-            f"Gemini jobs failed:   "
-            f"{matching_result.failed}"
-        )
+    if args.match:
+        print(f"Gemini jobs queued:   {matching.queued}")
+        print(f"Gemini jobs scored:   {matching.succeeded}")
+        print(f"Gemini jobs failed:   {matching.failed}")
 
-    print()
+    if args.notify:
+        print(f"Telegram queued:      {notifications.queued}")
+        print(f"Telegram sent:        {notifications.sent}")
+        print(f"Telegram failed:      {notifications.failed}")
 
-    if result.committed:
-        print("DATABASE RUN COMPLETE")
-    else:
-        print("DRY RUN COMPLETE")
+    failed = (
+        stage_failed
+        or result.failed_companies > 0
+        or matching.failed > 0
+        or notifications.failed > 0
+    )
+    print("RUN FINISHED WITH ERRORS" if failed else "RUN COMPLETE")
+    if failed:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

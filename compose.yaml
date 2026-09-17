@@ -1,0 +1,67 @@
+name: alberta-job-radar
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  api:
+    image: alberta-job-radar-backend:local
+    build:
+      context: .
+      target: backend
+    restart: unless-stopped
+    init: true
+    environment:
+      JOB_RADAR_DATABASE: /app/data/job_radar.db
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging: *logging
+
+  web:
+    image: alberta-job-radar-web:local
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    ports:
+      - "${JOB_RADAR_BIND_IP:-127.0.0.1}:${JOB_RADAR_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    logging: *logging
+
+  worker:
+    image: alberta-job-radar-backend:local
+    profiles: ["worker"]
+    init: true
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config:ro
+      - ./resumes:/app/resumes:ro
+    command:
+      - python
+      - -m
+      - job_radar.main
+      - --commit
+      - --match
+      - --notify
+      - --database
+      - /app/data/job_radar.db
+      - --resumes
+      - /app/resumes
+    logging: *logging

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Job Radar daily at 1 PM Edmonton time
+
+[Timer]
+OnCalendar=*-*-* 13:00:00 America/Edmonton
+Persistent=true
+Unit=job-radar.service
+
+[Install]
+WantedBy=timers.target
