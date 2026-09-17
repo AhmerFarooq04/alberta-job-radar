@@ -1,0 +1,1274 @@
+schema_version: 1
+
+defaults:
+  enabled: true
+  country: Canada
+  priority: alberta
+  request_delay_seconds: 2
+
+companies:
+  #Edmonton and Northern Alberta
+
+  - id: trio
+    name: TRIO - Translational Research in Oncology
+    sectors:
+      - healthcare
+      - clinical-research
+      - data
+    alberta_locations:
+      - Edmonton
+    careers_url: https://trioncology.org/about/careers/
+    jobs_url: https://triotranslationalresearchinoncology.applytojob.com/apply/
+    ats:
+      type: jsonld
+      listing_url: https://triotranslationalresearchinoncology.applytojob.com/apply/
+      link_pattern: "/apply/[A-Za-z0-9]+/"
+
+  - id: altaml
+    name: AltaML
+    sectors:
+      - artificial-intelligence
+      - software
+      - data
+    alberta_locations:
+      - Edmonton
+      - Calgary
+    careers_url: https://altaml.com/careers/
+    jobs_url: https://jobs.lever.co/altaml
+    ats:
+      type: lever
+      site: altaml
+
+  - id: jobber
+    name: Jobber
+    sectors:
+      - software
+      - fintech
+      - business-operations
+    alberta_locations:
+      - Edmonton
+    careers_url: https://www.getjobber.com/about/careers/
+    jobs_url: https://jobs.ashbyhq.com/jobber
+    ats:
+      type: ashby
+      board: jobber
+
+  - id: alberta-innovates
+    name: Alberta Innovates
+    sectors:
+      - research
+      - innovation
+      - energy
+      - technology
+    alberta_locations:
+      - Edmonton
+      - Calgary
+      - Devon
+      - Vegreville
+    careers_url: https://albertainnovates.ca/about/careers/
+    jobs_url: https://jobs.dayforcehcm.com/en-US/innovates/AlbertaInnovates
+    ats:
+      type: dayforce
+      namespace: innovates
+      board: AlbertaInnovates
+      culture: en-US
+
+  - id: applied-pharmaceutical-innovation
+    name: Applied Pharmaceutical Innovation
+    sectors:
+      - pharmaceuticals
+      - healthcare
+      - research
+      - data
+    alberta_locations:
+      - Edmonton
+    careers_url: https://appliedpharma.ca/contact/careers/
+    jobs_url: https://appliedpharma.bamboohr.com/careers
+    ats:
+      type: bamboohr
+      subdomain: appliedpharma
+
+  - id: samdesk
+    name: samdesk
+    sectors:
+      - software
+      - artificial-intelligence
+      - public-safety
+      - data
+    alberta_locations:
+      - Edmonton
+    careers_url: https://www.samdesk.io/careers
+    jobs_url: https://samsters.bamboohr.com/careers
+    ats:
+      type: bamboohr
+      subdomain: samsters
+
+  - id: darkhorse-analytics
+    name: Darkhorse Analytics
+    sectors:
+      - data
+      - analytics
+      - consulting
+      - visualization
+    alberta_locations:
+      - Edmonton
+    careers_url: https://darkhorsevisualization.com/careers
+    jobs_url: https://job-boards.greenhouse.io/darkhorseviz
+    ats:
+      type: greenhouse
+      board: darkhorseviz
+
+  - id: yardstick-technologies
+    name: Yardstick Technologies
+    sectors:
+      - managed-services
+      - information-technology
+      - cybersecurity
+    alberta_locations:
+      - Edmonton
+    careers_url: https://www.yardsticktechnologies.com/careers/
+    jobs_url: https://yardsticktechnologies.bamboohr.com/careers
+    ats:
+      type: bamboohr
+      subdomain: yardsticktechnologies
+
+  - id: peace-hills-insurance
+    name: Peace Hills Insurance
+    sectors:
+      - insurance
+      - finance
+      - data
+      - business-operations
+    alberta_locations:
+      - Edmonton
+    careers_url: https://www.peacehillsinsurance.com/careers/
+    jobs_url: https://www.peacehillsinsurance.com/careers/
+    ats:
+      type: jsonld
+      listing_url: https://www.peacehillsinsurance.com/careers/
+      link_pattern: "peacehillsinsurance[.]com/careers/[^/]+/$"
+
+  - id: clark-builders
+    name: Clark Builders
+    sectors:
+      - construction
+      - engineering
+      - business-operations
+      - information-technology
+    alberta_locations:
+      - Edmonton
+      - Calgary
+    careers_url: https://www.clarkbuilders.com/careers
+    jobs_url: https://cbgoc.wd3.myworkdayjobs.com/cb
+    ats:
+      type: workday
+      host: cbgoc.wd3.myworkdayjobs.com
+      tenant: cbgoc
+      site: cb
+      locale: en-US
+
+  - id: fountain-tire
+    name: Fountain Tire Corporate
+    sectors:
+      - automotive
+      - retail
+      - supply-chain
+      - information-technology
+    alberta_locations:
+      - Edmonton
+    careers_url: https://www.fountaintire.com/careers
+    jobs_url: "https://corporate-fountaintire.icims.com/jobs/search?ss=1&in_iframe=1"
+    ats:
+      type: jsonld
+      listing_url: "https://corporate-fountaintire.icims.com/jobs/search?ss=1&in_iframe=1"
+      link_pattern: "corporate-fountaintire[.]icims[.]com/jobs/[0-9]+/.+/job"
+
+  # Calgary and Southern Alberta
+
+  - id: zayzoon
+    name: ZayZoon
+    sectors:
+      - fintech
+      - software
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.zayzoon.com/work-with-us
+    jobs_url: https://jobs.ashbyhq.com/zayzoon
+    ats:
+      type: ashby
+      board: zayzoon
+
+  - id: attabotics
+    name: Attabotics
+    sectors:
+      - robotics
+      - automation
+      - software
+      - supply-chain
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.attabotics.com/careers
+    jobs_url: https://jobs.lever.co/attabotics
+    ats:
+      type: lever
+      site: attabotics
+
+  - id: absorb-software
+    name: Absorb Software
+    sectors:
+      - software
+      - education-technology
+      - data
+      - business-operations
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.absorbai.com/company/careers
+    jobs_url: https://jobs.ashbyhq.com/absorblms
+    ats:
+      type: ashby
+      board: absorblms
+
+  - id: blackline-safety
+    name: Blackline Safety
+    sectors:
+      - industrial-technology
+      - safety
+      - hardware
+      - software
+    alberta_locations:
+      - Calgary
+    careers_url: https://careers.blacklinesafety.com/
+    jobs_url: https://apply.workable.com/blacklinesafety/
+    ats:
+      type: workable
+      account: blacklinesafety
+
+  - id: stellaralgo
+    name: StellarAlgo
+    sectors:
+      - data
+      - analytics
+      - software
+      - sports
+    alberta_locations:
+      - Calgary
+    careers_url: https://stellaralgo.com/company/careers/
+    jobs_url: https://stellaralgo.com/company/careers/
+    ats:
+      type: html_board
+      listing_url: https://stellaralgo.com/company/careers/
+      link_pattern: "stellaralgo[.]com/(?:company/)?careers/jobs?/[^/]+/?$"
+      title_selector: h1
+      description_selector: main
+
+  - id: veerum
+    name: VEERUM
+    sectors:
+      - industrial-technology
+      - software
+      - data
+      - energy
+    alberta_locations:
+      - Calgary
+    careers_url: https://veerum.com/careers/
+    jobs_url: https://api.collage.co/v1/positions/veerum
+    ats:
+      type: collage
+      site: veerum
+
+  - id: neo-financial
+    name: Neo Financial
+    sectors:
+      - fintech
+      - banking
+      - software
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://careers.neofinancial.com/
+    jobs_url: https://jobs.ashbyhq.com/neofinancial
+    ats:
+      type: ashby
+      board: neofinancial
+
+  - id: purposemed
+    name: PurposeMed
+    sectors:
+      - healthcare
+      - software
+      - data
+      - business-operations
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.purposemed.com/careers
+    jobs_url: https://boards.greenhouse.io/purposemed
+    ats:
+      type: greenhouse
+      board: purposemed
+
+  - id: computer-modelling-group
+    name: Computer Modelling Group
+    sectors:
+      - energy
+      - simulation
+      - software
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.cmgl.ca/careers/
+    jobs_url: https://www.cmgl.ca/careers/
+    ats:
+      type: html_board
+      listing_url: https://www.cmgl.ca/careers/
+      link_pattern: "cmgl[.]ca/careers/[^/#?]+/$"
+      title_selector: ".job-opportunities h1"
+      description_selector: ".job-opportunities"
+      location_regex: "(Calgary, AB|Edmonton, AB|Bogota|Rio de Janeiro)"
+      employment_regex: "(Full Time(?:, Permanent)?)"
+
+  - id: arcurve
+    name: Arcurve
+    sectors:
+      - consulting
+      - software
+      - data
+      - information-technology
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.arcurve.com/careers
+    jobs_url: https://jobs.dayforcehcm.com/en-US/arcurve/CANDIDATEPORTAL
+    ats:
+      type: dayforce
+      namespace: arcurve
+      board: CANDIDATEPORTAL
+      culture: en-US
+
+  - id: eavor-technologies
+    name: Eavor Technologies
+    sectors:
+      - geothermal
+      - clean-technology
+      - engineering
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://eavor.com/careers/
+    jobs_url: https://eavortechnologies.bamboohr.com/careers
+    ats:
+      type: bamboohr
+      subdomain: eavortechnologies
+
+  - id: carbon-upcycling
+    name: Carbon Upcycling
+    sectors:
+      - clean-technology
+      - manufacturing
+      - engineering
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://carbonupcycling.com/careers/
+    jobs_url: https://jobs.deel.com/carbon-upcycling-technologies
+    ats:
+      type: deel
+      slug: carbon-upcycling-technologies
+
+  - id: acceleware
+    name: Acceleware
+    sectors:
+      - clean-technology
+      - energy
+      - software
+      - engineering
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.acceleware.com/careers
+    jobs_url: https://www.acceleware.com/careers
+    ats:
+      type: html_board
+      listing_url: https://www.acceleware.com/careers
+      link_pattern: "acceleware[.]com/careers/[^/#?]+/?$"
+      title_selector: h1
+      description_selector: main
+
+  - id: long-view-systems
+    name: Long View Systems
+    sectors:
+      - information-technology
+      - consulting
+      - cybersecurity
+      - cloud
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    careers_url: https://www.longviewsystems.com/careers/
+    jobs_url: https://jobs.lever.co/lvs1
+    ats:
+      type: lever
+      site: lvs1
+
+  - id: olympia-trust
+    name: Olympia Trust Company
+    sectors:
+      - financial-services
+      - fintech
+      - business-operations
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.olympiatrust.com/careers
+    jobs_url: "https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=b76168f5-f843-4d56-ac9c-046848844dad&ccId=19000101_000001&lang=en_CA"
+    ats:
+      type: adp
+      cid: b76168f5-f843-4d56-ac9c-046848844dad
+      cc_id: 19000101_000001
+      locale: en_CA
+
+  - id: geologic
+    name: Geologic
+    sectors:
+      - energy
+      - data
+      - analytics
+      - software
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.geologic.com/careers/
+    jobs_url: "https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=46a1322f-ebed-4331-a3d7-885b7bf32451&ccId=19000101_000001&lang=en_CA"
+    ats:
+      type: adp
+      cid: 46a1322f-ebed-4331-a3d7-885b7bf32451
+      cc_id: 19000101_000001
+      locale: en_CA
+
+  - id: peloton
+    name: Peloton
+    sectors:
+      - energy
+      - software
+      - data
+      - analytics
+    alberta_locations:
+      - Calgary
+    careers_url: https://www.peloton.com/about-us
+    jobs_url: https://pelotonwellfocused.bamboohr.com/careers/
+    ats:
+      type: bamboohr
+      subdomain: pelotonwellfocused
+
+  - id: spartan-controls
+    name: Spartan Controls
+    sectors:
+      - industrial-automation
+      - engineering
+      - energy
+      - information-technology
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    careers_url: https://careers.spartancontrols.com/
+    jobs_url: "https://careers.spartancontrols.com/search/?q=&locationsearch="
+    ats:
+      type: jsonld
+      listing_url: "https://careers.spartancontrols.com/search/?q=&locationsearch="
+      link_pattern: "careers[.]spartancontrols[.]com/job/.+/[0-9]+/"
+
+  # Additional Lever companies — Alberta or Canada-remote
+
+  - id: cura
+    name: CURA
+    sectors:
+      - clean-technology
+      - chemical-engineering
+      - manufacturing
+      - data
+    alberta_locations:
+      - Calgary
+    careers_url: https://jobs.lever.co/cura
+    jobs_url: https://jobs.lever.co/cura
+    priority: alberta
+    ats:
+      type: lever
+      site: cura
+
+  - id: cruxocm
+    name: CruxOCM
+    sectors:
+      - industrial-automation
+      - energy
+      - software
+      - data
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    careers_url: https://jobs.lever.co/cruxocm
+    jobs_url: https://jobs.lever.co/cruxocm
+    priority: alberta
+    ats:
+      type: lever
+      site: cruxocm
+
+  - id: promise-robotics
+    name: Promise Robotics
+    sectors:
+      - robotics
+      - artificial-intelligence
+      - manufacturing
+      - software
+      - construction
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    ontario_locations:
+      - Toronto
+    careers_url: https://jobs.lever.co/promiserobotics
+    jobs_url: https://jobs.lever.co/promiserobotics
+    priority: alberta
+    ats:
+      type: lever
+      site: promiserobotics
+
+  - id: shyftlabs
+    name: ShyftLabs
+    sectors:
+      - data
+      - analytics
+      - artificial-intelligence
+      - consulting
+      - software
+    alberta_locations:
+      - Calgary
+    ontario_locations:
+      - Toronto
+    careers_url: https://jobs.lever.co/shyftlabs
+    jobs_url: https://jobs.lever.co/shyftlabs
+    priority: alberta
+    ats:
+      type: lever
+      site: shyftlabs
+
+  - id: dialog-design
+    name: DIALOG
+    sectors:
+      - architecture
+      - engineering
+      - construction
+      - information-technology
+      - business-operations
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    ontario_locations:
+      - Toronto
+      - Ottawa
+    careers_url: https://jobs.lever.co/dialogdesign
+    jobs_url: https://jobs.lever.co/dialogdesign
+    priority: alberta
+    ats:
+      type: lever
+      site: dialogdesign
+
+  - id: black-white-zebra
+    name: Black and White Zebra
+    sectors:
+      - digital-media
+      - marketing
+      - analytics
+      - business-operations
+      - information-technology
+    alberta_locations:
+      - Calgary
+      - Edmonton
+    ontario_locations:
+      - Toronto
+      - Ottawa
+    careers_url: https://jobs.lever.co/Black-White-Zebra
+    jobs_url: https://jobs.lever.co/Black-White-Zebra
+    priority: alberta
+    ats:
+      type: lever
+      site: Black-White-Zebra
+
+  - id: sprypoint
+    name: SpryPoint
+    sectors:
+      - utilities
+      - software
+      - data
+      - quality-assurance
+      - business-operations
+    alberta_locations:
+      - Remote Alberta
+    ontario_locations:
+      - Remote Ontario
+    careers_url: https://jobs.lever.co/sprypointservices
+    jobs_url: https://jobs.lever.co/sprypointservices
+    priority: alberta
+    ats:
+      type: lever
+      site: sprypointservices
+
+  # Additional Lever companies — Ontario
+
+  - id: policyme
+    name: PolicyMe
+    sectors:
+      - insurance
+      - fintech
+      - software
+      - data
+      - business-operations
+    ontario_locations:
+      - Toronto
+      - Remote Ontario
+    careers_url: https://jobs.lever.co/policyme
+    jobs_url: https://jobs.lever.co/policyme
+    priority: ontario
+    ats:
+      type: lever
+      site: policyme
+
+  - id: kepler-communications
+    name: Kepler Communications
+    sectors:
+      - aerospace
+      - telecommunications
+      - software
+      - hardware
+      - information-technology
+    ontario_locations:
+      - Toronto
+    careers_url: https://jobs.lever.co/kepler
+    jobs_url: https://jobs.lever.co/kepler
+    priority: ontario
+    ats:
+      type: lever
+      site: kepler
+
+  - id: knix
+    name: Knix
+    sectors:
+      - retail
+      - ecommerce
+      - digital-product
+      - analytics
+      - business-operations
+    ontario_locations:
+      - Toronto
+      - Mississauga
+      - Remote Ontario
+    careers_url: https://jobs.lever.co/knix
+    jobs_url: https://jobs.lever.co/knix
+    priority: ontario
+    ats:
+      type: lever
+      site: knix
+
+  - id: suncor
+    name: Suncor
+    sectors:
+      - energy
+      - engineering
+      - data
+      - analytics
+      - information-technology
+      - business-operations
+    alberta_locations:
+      - Calgary
+      - Edmonton
+      - Fort McMurray
+    careers_url: https://suncor.wd1.myworkdayjobs.com/en-US/Suncor_External
+    jobs_url: https://suncor.wd1.myworkdayjobs.com/en-US/Suncor_External
+    priority: alberta
+    detail_delay_seconds: 0.25
+    ats:
+      type: workday
+      host: suncor.wd1.myworkdayjobs.com
+      tenant: suncor
+      site: Suncor_External
+      locale: en-US
+  - id: zensurance
+    name: Zensurance
+    sectors: [insurance, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.zensurance.com/careers
+    jobs_url: https://jobs.lever.co/zensurance
+    priority: ontario
+    ats:
+      type: lever
+      site: zensurance
+
+  - id: maple
+    name: Maple
+    sectors: [healthcare, digital-health]
+    ontario_locations: [Toronto]
+    careers_url: https://www.getmaple.ca/careers/
+    jobs_url: https://jobs.lever.co/getmaple
+    priority: ontario
+    ats:
+      type: lever
+      site: getmaple
+
+  - id: fig-financial
+    name: Fig Financial
+    sectors: [financial-services, lending]
+    ontario_locations: [Toronto]
+    careers_url: https://fig.ca/en/careers/
+    jobs_url: https://jobs.lever.co/figfinancial
+    priority: ontario
+    ats:
+      type: lever
+      site: figfinancial
+
+  - id: allied-properties-reit
+    name: Allied Properties REIT
+    sectors: [real-estate, property-management]
+    ontario_locations: [Toronto]
+    careers_url: https://jobs.lever.co/alliedreit
+    jobs_url: https://jobs.lever.co/alliedreit
+    priority: ontario
+    ats:
+      type: lever
+      site: alliedreit
+
+  - id: equitable-bank
+    name: EQ Bank / Equitable Bank
+    sectors: [banking, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://jobs.lever.co/eqbank
+    jobs_url: https://jobs.lever.co/eqbank
+    priority: ontario
+    ats:
+      type: lever
+      site: eqbank
+
+  - id: mejuri
+    name: Mejuri
+    sectors: [retail, jewellery, e-commerce]
+    ontario_locations: [Toronto]
+    careers_url: https://mejuri.com/careers
+    jobs_url: https://job-boards.greenhouse.io/mejuri
+    priority: ontario
+    ats:
+      type: greenhouse
+      board: mejuri
+
+  - id: connor-clark-lunn-financial-group
+    name: Connor, Clark & Lunn Financial Group
+    sectors: [financial-services, investment-management]
+    ontario_locations: [Toronto]
+    careers_url: https://cclfg.cclgroup.com/careers/opportunities/
+    jobs_url: https://job-boards.greenhouse.io/cclfg
+    priority: ontario
+    ats:
+      type: greenhouse
+      board: cclfg
+
+  - id: salt-xc
+    name: Salt XC
+    sectors: [marketing, advertising, professional-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.saltxc.com/careers
+    jobs_url: https://job-boards.greenhouse.io/saltxc
+    priority: ontario
+    ats:
+      type: greenhouse
+      board: saltxc
+
+  - id: pointclickcare
+    name: PointClickCare
+    sectors: [healthcare, software]
+    ontario_locations: [Mississauga, Toronto]
+    careers_url: https://jobs.lever.co/pointclickcare
+    jobs_url: https://jobs.lever.co/pointclickcare
+    priority: ontario
+    ats:
+      type: lever
+      site: pointclickcare
+
+  - id: canada-goose
+    name: Canada Goose
+    sectors: [apparel, retail, manufacturing]
+    ontario_locations: [Toronto]
+    careers_url: https://www.canadagoose.com/en-us/pages/careers
+    jobs_url: https://canadagoose.wd3.myworkdayjobs.com/CanadaGooseCareers
+    priority: ontario
+    ats:
+      type: workday
+      host: canadagoose.wd3.myworkdayjobs.com
+      tenant: canadagoose
+      site: CanadaGooseCareers
+      locale: en-US
+
+  - id: northland-power
+    name: Northland Power
+    sectors: [energy, renewable-energy, power-generation]
+    ontario_locations: [Toronto]
+    careers_url: https://northlandpower.com/careers/
+    jobs_url: https://northlandpower.wd3.myworkdayjobs.com/ExternalCS
+    priority: ontario
+    ats:
+      type: workday
+      host: northlandpower.wd3.myworkdayjobs.com
+      tenant: northlandpower
+      site: ExternalCS
+      locale: en-US
+
+  - id: ellisdon
+    name: EllisDon
+    sectors: [construction, infrastructure]
+    ontario_locations: [Mississauga]
+    careers_url: https://www.ellisdon.com/work-with-us
+    jobs_url: https://ellisdon.wd3.myworkdayjobs.com/Ellis-Don
+    priority: ontario
+    ats:
+      type: workday
+      host: ellisdon.wd3.myworkdayjobs.com
+      tenant: ellisdon
+      site: Ellis-Don
+      locale: en-US
+
+  - id: tricon-residential
+    name: Tricon Residential
+    sectors: [real-estate, property-management]
+    ontario_locations: [Toronto]
+    careers_url: https://triconhomes.com/careers/
+    jobs_url: https://tricon.wd3.myworkdayjobs.com/tricon
+    priority: ontario
+    ats:
+      type: workday
+      host: tricon.wd3.myworkdayjobs.com
+      tenant: tricon
+      site: tricon
+      locale: en-US
+
+  - id: oanda
+    name: OANDA
+    sectors: [financial-services, trading, financial-data]
+    ontario_locations: [Toronto]
+    careers_url: https://oanda.wd10.myworkdayjobs.com/External
+    jobs_url: https://oanda.wd10.myworkdayjobs.com/External
+    priority: ontario
+    ats:
+      type: workday
+      host: oanda.wd10.myworkdayjobs.com
+      tenant: oanda
+      site: External
+      locale: en-US
+
+  - id: green-infrastructure-partners
+    name: Green Infrastructure Partners
+    sectors: [construction, infrastructure, construction-materials]
+    ontario_locations: [Markham]
+    careers_url: https://gipi.com/careers/
+    jobs_url: https://gipi.wd3.myworkdayjobs.com/en-US/Careers
+    priority: ontario
+    ats:
+      type: workday
+      host: gipi.wd3.myworkdayjobs.com
+      tenant: gipi
+      site: Careers
+      locale: en-US
+
+  - id: ipex
+    name: IPEX
+    sectors: [manufacturing, building-products, industrial]
+    ontario_locations: [Oakville]
+    careers_url: https://aliaxis.wd3.myworkdayjobs.com/IPEX
+    jobs_url: https://aliaxis.wd3.myworkdayjobs.com/IPEX
+    priority: ontario
+    ats:
+      type: workday
+      host: aliaxis.wd3.myworkdayjobs.com
+      tenant: aliaxis
+      site: IPEX
+      locale: en-US
+
+  - id: caseware
+    name: Caseware
+    sectors: [software, accounting-technology, audit-technology]
+    ontario_locations: [Toronto]
+    careers_url: https://www.caseware.com/careers/
+    jobs_url: https://jobs.lever.co/caseware
+    priority: ontario
+    ats:
+      type: lever
+      site: caseware
+
+  - id: wattpad-webtoon
+    name: Wattpad / WEBTOON Entertainment
+    sectors: [media, publishing, entertainment]
+    ontario_locations: [Toronto]
+    careers_url: https://jobs.lever.co/wattpad
+    jobs_url: https://jobs.lever.co/wattpad
+    priority: ontario
+    ats:
+      type: lever
+      site: wattpad
+
+  - id: upshop
+    name: Upshop
+    sectors: [software, retail-technology, supply-chain]
+    ontario_locations: [Mississauga, Toronto]
+    careers_url: https://upshop.com/careers/
+    jobs_url: https://job-boards.greenhouse.io/upshop
+    priority: ontario
+    ats:
+      type: greenhouse
+      board: upshop
+
+  - id: greenfield-global
+    name: Greenfield Global
+    sectors: [manufacturing, chemicals, renewable-energy]
+    ontario_locations: [Toronto]
+    careers_url: https://greenfield.com/careers
+    jobs_url: https://jobs.dayforcehcm.com/en-US/GGI/CANDIDATEPORTAL
+    priority: ontario
+    ats:
+      type: dayforce
+      namespace: GGI
+      board: CANDIDATEPORTAL
+      culture: en-US
+  - id: wcb-alberta
+    name: WCB-Alberta
+    sectors: [insurance, public-sector]
+    alberta_locations: [Edmonton]
+    careers_url: https://www.wcb.ab.ca/about-wcb/careers/
+    jobs_url: https://wcbalberta.wd10.myworkdayjobs.com/wcbalbertacareers
+    priority: alberta
+    ats: {type: workday, host: wcbalberta.wd10.myworkdayjobs.com, tenant: wcbalberta, site: wcbalbertacareers}
+
+  - id: aimco
+    name: Alberta Investment Management Corporation
+    sectors: [investment-management, public-sector]
+    alberta_locations: [Edmonton, Calgary]
+    careers_url: https://www.aimco.ca/careers/
+    jobs_url: https://aimco.wd10.myworkdayjobs.com/AIMCoCareers
+    priority: alberta
+    ats: {type: workday, host: aimco.wd10.myworkdayjobs.com, tenant: aimco, site: AIMCoCareers}
+
+  - id: alberta-energy-regulator
+    name: Alberta Energy Regulator
+    sectors: [energy, regulation]
+    alberta_locations: [Calgary, Edmonton]
+    careers_url: https://aer.wd3.myworkdayjobs.com/AER
+    jobs_url: https://aer.wd3.myworkdayjobs.com/AER
+    priority: alberta
+    ats: {type: workday, host: aer.wd3.myworkdayjobs.com, tenant: aer, site: AER}
+
+  - id: hoopp
+    name: Healthcare of Ontario Pension Plan
+    sectors: [pensions, investment-management]
+    ontario_locations: [Toronto]
+    careers_url: https://hoopp.com/about-hoopp/hoopp-careers
+    jobs_url: https://hoopp.wd10.myworkdayjobs.com/HOOPP
+    priority: ontario
+    ats: {type: workday, host: hoopp.wd10.myworkdayjobs.com, tenant: hoopp, site: HOOPP}
+
+  - id: optrust
+    name: OPTrust
+    sectors: [pensions, investment-management]
+    ontario_locations: [Toronto]
+    careers_url: https://www.optrust.com/careers
+    jobs_url: https://optrust.wd3.myworkdayjobs.com/OPTrust
+    priority: ontario
+    ats: {type: workday, host: optrust.wd3.myworkdayjobs.com, tenant: optrust, site: OPTrust}
+
+  - id: omers
+    name: OMERS / Oxford Properties
+    sectors: [pensions, investment-management, real-estate]
+    ontario_locations: [Toronto]
+    careers_url: https://www.omers.com/careers
+    jobs_url: https://omers.wd3.myworkdayjobs.com/OMERS_External
+    priority: ontario
+    ats: {type: workday, host: omers.wd3.myworkdayjobs.com, tenant: omers, site: OMERS_External}
+
+  - id: homeequity-bank
+    name: HomeEquity Bank
+    sectors: [banking, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.homeequitybank.ca/careers/career-opportunities/
+    jobs_url: https://homeequitybank.wd10.myworkdayjobs.com/HEB_Careers
+    priority: ontario
+    ats: {type: workday, host: homeequitybank.wd10.myworkdayjobs.com, tenant: homeequitybank, site: HEB_Careers}
+
+  - id: agf-management
+    name: AGF Management
+    sectors: [investment-management, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.agf.com/corporate/careers/index.jsp
+    jobs_url: https://agf.wd3.myworkdayjobs.com/AGF_Careers
+    priority: ontario
+    ats: {type: workday, host: agf.wd3.myworkdayjobs.com, tenant: agf, site: AGF_Careers}
+
+  - id: foresters-financial
+    name: Foresters Financial
+    sectors: [insurance, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.foresters.com/en-ca/careers
+    jobs_url: https://foresters.wd3.myworkdayjobs.com/ForestersFinancialCareers
+    priority: ontario
+    ats: {type: workday, host: foresters.wd3.myworkdayjobs.com, tenant: foresters, site: ForestersFinancialCareers}
+
+  - id: tmx-group
+    name: TMX Group
+    sectors: [financial-services, capital-markets]
+    ontario_locations: [Toronto]
+    careers_url: https://www.tmx.com/en/careers
+    jobs_url: https://tmx.wd3.myworkdayjobs.com/TMX_Careers
+    priority: ontario
+    ats: {type: workday, host: tmx.wd3.myworkdayjobs.com, tenant: tmx, site: TMX_Careers}
+
+  - id: ci-financial
+    name: CI Financial
+    sectors: [investment-management, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.cifinancial.com/ci-financial/ca/en/about-us/careers.html
+    jobs_url: https://ci.wd3.myworkdayjobs.com/CI_FINANCIAL_EXTERNAL_CAREER-SITE
+    priority: ontario
+    ats: {type: workday, host: ci.wd3.myworkdayjobs.com, tenant: ci, site: CI_FINANCIAL_EXTERNAL_CAREER-SITE}
+
+  - id: holt-renfrew
+    name: Holt Renfrew
+    sectors: [retail, fashion]
+    ontario_locations: [Toronto]
+    careers_url: https://myview.wd3.myworkdayjobs.com/Holt_Renfrew_External_Career_Site
+    jobs_url: https://myview.wd3.myworkdayjobs.com/Holt_Renfrew_External_Career_Site
+    priority: ontario
+    ats: {type: workday, host: myview.wd3.myworkdayjobs.com, tenant: myview, site: Holt_Renfrew_External_Career_Site}
+
+  - id: imax
+    name: IMAX
+    sectors: [entertainment, technology]
+    ontario_locations: [Mississauga]
+    careers_url: https://careers.imax.com/us/en
+    jobs_url: https://imax.wd10.myworkdayjobs.com/IMAX-Careers
+    priority: ontario
+    ats: {type: workday, host: imax.wd10.myworkdayjobs.com, tenant: imax, site: IMAX-Careers}
+
+  - id: culligan-quench
+    name: Culligan Quench
+    sectors: [water-treatment, equipment-services]
+    ontario_locations: [Toronto, Woodbridge]
+    careers_url: https://jobs.lever.co/quenchwater
+    jobs_url: https://jobs.lever.co/quenchwater
+    priority: ontario
+    ats: {type: lever, site: quenchwater}
+
+  - id: league
+    name: League
+    sectors: [healthcare-technology]
+    ontario_locations: [Toronto]
+    careers_url: https://league.com/careers/
+    jobs_url: https://job-boards.greenhouse.io/leagueinc
+    priority: ontario
+    ats: {type: greenhouse, board: leagueinc}
+
+  - id: wave
+    name: Wave
+    sectors: [financial-technology, accounting-software]
+    ontario_locations: [Toronto]
+    careers_url: https://jobs.lever.co/waveapps
+    jobs_url: https://jobs.lever.co/waveapps
+    priority: ontario
+    ats: {type: lever, site: waveapps}
+
+  - id: pockethealth
+    name: PocketHealth
+    sectors: [healthcare-technology, medical-imaging]
+    ontario_locations: [Greater Toronto Area]
+    careers_url: https://www.pockethealth.com/company/careers/
+    jobs_url: https://jobs.lever.co/PocketHealth
+    priority: ontario
+    ats: {type: lever, site: PocketHealth}
+
+  - id: achievers
+    name: Achievers
+    sectors: [human-resources-technology]
+    ontario_locations: [Toronto]
+    careers_url: https://www.achievers.com/company/careers/
+    jobs_url: https://jobs.lever.co/achievers
+    priority: ontario
+    ats: {type: lever, site: achievers}
+
+  - id: nait
+    name: Northern Alberta Institute of Technology
+    sectors: [education, applied-research]
+    alberta_locations: [Edmonton]
+    careers_url: https://www.nait.ca/nait/about/work-at-nait
+    jobs_url: https://nait.wd10.myworkdayjobs.com/NAIT_Careers
+    priority: alberta
+    ats: {type: workday, host: nait.wd10.myworkdayjobs.com, tenant: nait, site: NAIT_Careers}
+
+  - id: sait
+    name: Southern Alberta Institute of Technology
+    sectors: [education, applied-research]
+    alberta_locations: [Calgary]
+    careers_url: https://www.sait.ca/about-sait/work-at-sait
+    jobs_url: https://jobs.lever.co/sait
+    priority: alberta
+    ats: {type: lever, site: sait}
+
+  - id: alberta-blue-cross
+    name: Alberta Blue Cross
+    sectors: [insurance, health-benefits]
+    alberta_locations: [Edmonton]
+    careers_url: https://abbluecross.wd3.myworkdayjobs.com/careers
+    jobs_url: https://abbluecross.wd3.myworkdayjobs.com/careers
+    priority: alberta
+    ats: {type: workday, host: abbluecross.wd3.myworkdayjobs.com, tenant: abbluecross, site: careers}
+
+  - id: enmax
+    name: ENMAX
+    sectors: [utilities, electricity]
+    alberta_locations: [Calgary]
+    careers_url: https://www.enmax.com/careers
+    jobs_url: https://enmax.wd3.myworkdayjobs.com/ENMAXCareers
+    priority: alberta
+    ats: {type: workday, host: enmax.wd3.myworkdayjobs.com, tenant: enmax, site: ENMAXCareers}
+
+  - id: altagas
+    name: AltaGas
+    sectors: [energy, utilities]
+    alberta_locations: [Calgary]
+    careers_url: https://www.altagas.ca/careers
+    jobs_url: https://wgl.wd5.myworkdayjobs.com/AltaGas
+    priority: alberta
+    ats: {type: workday, host: wgl.wd5.myworkdayjobs.com, tenant: wgl, site: AltaGas}
+
+  - id: cenovus
+    name: Cenovus Energy
+    sectors: [energy, oil-and-gas]
+    alberta_locations: [Calgary]
+    careers_url: https://www.cenovus.com/Careers/Current-opportunities
+    jobs_url: https://cenovus.wd3.myworkdayjobs.com/careers
+    priority: alberta
+    ats: {type: workday, host: cenovus.wd3.myworkdayjobs.com, tenant: cenovus, site: careers}
+
+  - id: bird-construction
+    name: Bird Construction
+    sectors: [construction, infrastructure]
+    alberta_locations: [Calgary]
+    ontario_locations: [Mississauga]
+    careers_url: https://careers.bird.ca/
+    jobs_url: https://bird.wd3.myworkdayjobs.com/BirdConstructionCareers
+    priority: alberta
+    ats: {type: workday, host: bird.wd3.myworkdayjobs.com, tenant: bird, site: BirdConstructionCareers}
+
+  - id: flynn-group
+    name: Flynn Group of Companies
+    sectors: [construction, manufacturing]
+    alberta_locations: [Calgary]
+    careers_url: https://flynncompanies.com/office-roles/
+    jobs_url: https://jobs.lever.co/flynncompanies
+    priority: alberta
+    ats: {type: lever, site: flynncompanies}
+
+  - id: finning
+    name: Finning
+    sectors: [industrial-equipment, equipment-services]
+    alberta_locations: [Edmonton]
+    careers_url: https://www.finning.com/en_CA/company/careers.html
+    jobs_url: https://finning.wd3.myworkdayjobs.com/External
+    priority: alberta
+    ats: {type: workday, host: finning.wd3.myworkdayjobs.com, tenant: finning, site: External}
+
+  - id: lcbo
+    name: Liquor Control Board of Ontario
+    sectors: [public-sector, retail, distribution]
+    ontario_locations: [Toronto]
+    careers_url: https://www.lcbo.com/content/lcbo/en/corporate-pages/careers.html
+    jobs_url: https://lcbo.wd3.myworkdayjobs.com/LCBOCareerSite
+    priority: ontario
+    ats: {type: workday, host: lcbo.wd3.myworkdayjobs.com, tenant: lcbo, site: LCBOCareerSite}
+
+  - id: interac
+    name: Interac
+    sectors: [payments, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.interac.ca/en/company/careers/careers-at-interac/
+    jobs_url: https://interac.wd3.myworkdayjobs.com/Interac
+    priority: ontario
+    ats: {type: workday, host: interac.wd3.myworkdayjobs.com, tenant: interac, site: Interac}
+
+  - id: ontario-teachers-pension-plan
+    name: Ontario Teachers' Pension Plan
+    sectors: [pensions, investment-management]
+    ontario_locations: [Toronto]
+    careers_url: https://www.otpp.com/en-ca/careers/
+    jobs_url: https://otppb.wd3.myworkdayjobs.com/OntarioTeachers_Careers
+    priority: ontario
+    ats: {type: workday, host: otppb.wd3.myworkdayjobs.com, tenant: otppb, site: OntarioTeachers_Careers}
+
+  - id: bruce-power
+    name: Bruce Power
+    sectors: [energy, nuclear-power]
+    ontario_locations: [Tiverton]
+    careers_url: https://www.brucepower.com/careers/
+    jobs_url: https://brucepower.wd3.myworkdayjobs.com/BrucePower
+    priority: ontario
+    ats: {type: workday, host: brucepower.wd3.myworkdayjobs.com, tenant: brucepower, site: BrucePower}
+
+  - id: canadian-tire-corporation
+    name: Canadian Tire Corporation
+    sectors: [retail, financial-services, supply-chain]
+    ontario_locations: [Toronto, Oakville]
+    careers_url: https://corp.canadiantire.ca/English/careers/default.aspx
+    jobs_url: https://canadiantirecorporation.wd3.myworkdayjobs.com/Enterprise_External_Careers_Site
+    priority: ontario
+    ats: {type: workday, host: canadiantirecorporation.wd3.myworkdayjobs.com, tenant: canadiantirecorporation, site: Enterprise_External_Careers_Site}
+
+  - id: gore-mutual
+    name: Gore Mutual Insurance
+    sectors: [insurance]
+    ontario_locations: [Toronto, Cambridge]
+    careers_url: https://www.goremutual.ca/jobs/
+    jobs_url: https://job-boards.greenhouse.io/goremutualinsurance
+    priority: ontario
+    ats: {type: greenhouse, board: goremutualinsurance}
+
+  - id: element-fleet-management
+    name: Element Fleet Management
+    sectors: [fleet-management, transportation, financial-services]
+    ontario_locations: [Toronto]
+    careers_url: https://www.elementfleet.com/careers
+    jobs_url: https://elementfleet.wd3.myworkdayjobs.com/External_Career_Site
+    priority: ontario
+    ats: {type: workday, host: elementfleet.wd3.myworkdayjobs.com, tenant: elementfleet, site: External_Career_Site}
+
+  - id: magnet-forensics
+    name: Magnet Forensics
+    sectors: [digital-forensics, cybersecurity]
+    ontario_locations: [Waterloo]
+    careers_url: https://www.magnetforensics.com/careers/
+    jobs_url: https://jobs.lever.co/magnetforensics
+    priority: ontario
+    ats: {type: lever, site: magnetforensics}
+
+  - id: deliverect
+    name: Deliverect
+    sectors: [restaurant-technology, software]
+    ontario_locations: [Toronto]
+    careers_url: https://www.deliverect.com/en/careers
+    jobs_url: https://jobs.lever.co/deliverect
+    priority: ontario
+    ats: {type: lever, site: deliverect}
+
+  - id: waabi
+    name: Waabi
+    sectors: [autonomous-vehicles, artificial-intelligence]
+    ontario_locations: [Toronto]
+    careers_url: https://waabi.ai/careers
+    jobs_url: https://jobs.lever.co/waabi
+    priority: ontario
+    ats: {type: lever, site: waabi}
+
+  - id: pigment
+    name: Pigment
+    sectors: [business-planning, analytics, software]
+    ontario_locations: [Toronto]
+    careers_url: https://www.pigment.com/careers
+    jobs_url: https://jobs.lever.co/pigment
+    priority: ontario
+    ats: {type: lever, site: pigment}
