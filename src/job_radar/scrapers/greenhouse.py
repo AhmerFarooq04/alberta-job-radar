@@ -1,4 +1,3 @@
-from datetime import datetime
 
 import requests
 
@@ -6,18 +5,7 @@ from job_radar.models import Job
 from job_radar.scrapers.base import BaseScraper, html_to_text
 
 
-def parse_iso_datetime(value: str | None) -> datetime | None:
-    """Parse an ISO 8601 timestamp when one is available."""
-
-    if not value:
-        return None
-
-    try:
-        return datetime.fromisoformat(
-            value.replace("Z", "+00:00")
-        )
-    except ValueError:
-        return None
+from job_radar.dates import parse_posted_date as parse_iso_datetime
 
 
 class GreenhouseScraper(BaseScraper):

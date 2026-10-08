@@ -7,6 +7,7 @@ from job_radar.filters import (
     passes_prefilter_values,
 )
 from job_radar.models import Job
+from job_radar.dates import parse_posted_date
 from job_radar.scrapers.base import (
     BaseScraper,
     html_to_text,
@@ -294,7 +295,8 @@ class WorkdayScraper(BaseScraper):
             ),
             job_url=direct_job_url,
             source="workday",
-            posted_at=None,
+            posted_at=(parse_posted_date(job_info.get("startDate"))
+                       or parse_posted_date(posted_text)),
             posted_text=posted_text,
             employment_type=employment_type,
             workplace_type=workplace_type,

@@ -56,6 +56,7 @@ def main() -> None:
                 matcher,
                 resumes,
                 retry_errors=False,
+                local_first=False,
             )
         finally:
             matcher.close()

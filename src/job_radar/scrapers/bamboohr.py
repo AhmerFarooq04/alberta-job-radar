@@ -1,5 +1,4 @@
 import time
-from datetime import datetime
 
 import requests
 
@@ -11,18 +10,7 @@ from job_radar.scrapers.base import (
 )
 
 
-def parse_posted_date(
-    value: str | None,
-) -> datetime | None:
-    """Parse BambooHR's YYYY-MM-DD posting date."""
-
-    if not value:
-        return None
-
-    try:
-        return datetime.fromisoformat(value)
-    except (TypeError, ValueError):
-        return None
+from job_radar.dates import parse_posted_date
 
 
 class BambooHRScraper(BaseScraper):

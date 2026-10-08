@@ -1,8 +1,8 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif;
-  color: #e6edf3;
-  background: #0d1117;
+  color: #f5f5f5;
+  background: #000;
   color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -35,9 +35,65 @@ a:focus-visible {
 }
 
 .app {
+  isolation: isolate;
   padding: 0 24px 24px;
   max-width: 2200px;
   margin: 0 auto;
+}
+
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.falling-star {
+  position: absolute;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #fff);
+  opacity: 0;
+  animation: falling-star 10s linear infinite;
+}
+
+.falling-star::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -1px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+@keyframes falling-star {
+  0% { opacity: 0; transform: translate(-120px, -120px) rotate(45deg); }
+  3% { opacity: 0.65; }
+  18% { opacity: 0; transform: translate(280px, 280px) rotate(45deg); }
+  100% { opacity: 0; transform: translate(280px, 280px) rotate(45deg); }
+}
+
+.load-more {
+  min-height: 36px;
+  padding: 8px;
+  border: 1px solid #ffffff80;
+  border-radius: 6px;
+  background: #000;
+  color: #f5f5f5;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.load-more span {
+  color: #aaa;
+  font-size: 10px;
+}
+
+.load-more:hover {
+  border-color: #fff;
 }
 
 .toolbar {
@@ -73,9 +129,9 @@ h1 svg {
   display: flex;
   padding: 3px;
   gap: 3px;
-  border: 1px solid #30363d;
+  border: 1px solid #ffffff80;
   border-radius: 7px;
-  background: #010409;
+  background: #000;
 }
 
 .periods button {
@@ -93,14 +149,13 @@ h1 svg {
 
 .periods button:hover {
   color: #e6edf3;
-  background: #161b22;
+  background: #000;
 }
 
 .periods button[aria-pressed="true"] {
   color: #f0f6fc;
-  border-color: #3d444d;
-  background: #21262d;
-  box-shadow: 0 1px 2px #0005;
+  border-color: #fff;
+  background: #000;
 }
 
 .board {
@@ -112,9 +167,9 @@ h1 svg {
 
 .column {
   min-width: 0;
-  min-height: 150 px;
-  background: #10151c;
-  border: 1px solid #252c35;
+  min-height: 150px;
+  background: #000;
+  border: 1px solid #ffffff80;
   border-radius: 8px;
 }
 
@@ -124,7 +179,7 @@ h1 svg {
   align-items: center;
   gap: 8px;
   padding: 14px 12px;
-  border-bottom: 1px solid #252c35;
+  border-bottom: 1px solid #ffffff80;
 }
 
 .column-header h2 {
@@ -144,8 +199,9 @@ h1 svg {
   height: 20px;
   padding: 0 6px;
   border-radius: 10px;
-  background: #21262d;
-  color: #9da7b3;
+  background: #000;
+  border: 1px solid #ffffff60;
+  color: #b8b8b8;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -158,51 +214,62 @@ h1 svg {
 }
 
 .job-card {
-  --surface: #161b22;
-  --edge: #30363d;
-  --hover-edge: #596573;
-
+  --score-color: #888;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 22px;
+  gap: 18px;
   min-width: 0;
-  min-height: 112px;
-  padding: 14px 12px 12px;
-  color: #e6edf3;
+  height: 118px;
+  padding: 16px 14px 12px;
+  color: #f5f5f5;
   text-decoration: none;
-  background: var(--surface);
-  border: 1px solid var(--edge);
+  background: #000;
+  border: 1px solid #ffffff80;
   border-radius: 6px;
-  box-shadow: 0 1px 3px #0003;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color 120ms ease;
 }
 
 .job-card.strong {
-  --surface: #14251e;
-  --edge: #294939;
-  --hover-edge: #43865f;
+  --score-color: #56d68a;
 }
 
 .job-card.possible {
-  --surface: #272319;
-  --edge: #49412b;
-  --hover-edge: #89713d;
+  --score-color: #e8c65a;
 }
 
 .job-card.weak {
-  --surface: #281c20;
-  --edge: #493039;
-  --hover-edge: #88505b;
+  --score-color: #ed7885;
 }
 
 a.job-card:hover {
-  border-color: var(--hover-edge);
-  box-shadow: 0 2px 6px #0005;
+  border-color: #fff;
+}
+
+.score-dot {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--score-color);
+}
+
+.job-card.unscored .score-dot {
+  background: transparent;
+  border: 1px solid var(--score-color);
 }
 
 .job-card h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   margin: 0;
+  padding-right: 14px;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
@@ -215,19 +282,23 @@ a.job-card:hover {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: end;
   gap: 8px;
-  color: #adb6c1;
+  color: #aaa;
   font-size: 10px;
   line-height: 1.5;
 }
 
 .company {
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .date {
   text-align: right;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty {
@@ -244,16 +315,16 @@ a.job-card:hover {
   gap: 12px;
   margin-bottom: 16px;
   padding: 12px 14px;
-  border: 1px solid #684049;
+  border: 1px solid #ffffff80;
   border-radius: 6px;
   color: #f0bec6;
-  background: #281c20;
+  background: #000;
   font-size: 13px;
 }
 
 .error-message button {
   padding: 5px 12px;
-  border: 1px solid #684049;
+  border: 1px solid #ffffff80;
   border-radius: 4px;
   background: transparent;
   color: inherit;
@@ -311,6 +382,9 @@ a.job-card:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .starfield {
+    display: none;
+  }
   .job-card {
     transition: none;
   }

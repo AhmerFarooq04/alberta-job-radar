@@ -401,7 +401,7 @@ def test_below_threshold_job_is_still_saved(
     database = FakeDatabase([
         {
             "fingerprint": "job-one",
-            "title": "Adjacent Role",
+            "title": "Financial Analyst",
         }
     ])
 
@@ -442,11 +442,11 @@ def test_failed_job_does_not_stop_queue(
     database = FakeDatabase([
         {
             "fingerprint": "job-one",
-            "title": "First Job",
+            "title": "Business Analyst",
         },
         {
             "fingerprint": "job-two",
-            "title": "Second Job",
+            "title": "Operations Analyst",
         },
     ])
 
@@ -489,11 +489,11 @@ def test_process_pending_jobs_respects_limit(
     database = FakeDatabase([
         {
             "fingerprint": "job-one",
-            "title": "First Job",
+            "title": "Business Analyst",
         },
         {
             "fingerprint": "job-two",
-            "title": "Second Job",
+            "title": "Operations Analyst",
         },
     ])
 
@@ -520,3 +520,78 @@ def test_process_pending_jobs_respects_limit(
     assert result.queued == 1
     assert result.succeeded == 1
     assert len(database.saved) == 1
+
+
+def test_local_matching_resolves_clear_fit_without_gemini(job, resumes):
+    database = FakeDatabase([dict(job, fingerprint="local")])
+    matcher = FakeMatcher([])
+    summary = process_pending_jobs(database, matcher, resumes)
+    assert summary.local == 1
+    assert summary.gemini_requests == 0
+    assert database.saved[0][1]["score"] >= 75
+    assert database.saved[0][1]["reason"].startswith("Local rules:")
+
+
+def test_local_rejection_does_not_call_gemini(resumes):
+    database = FakeDatabase([{"fingerprint": "bad", "title": "Senior Software Engineer"}])
+    summary = process_pending_jobs(database, FakeMatcher([]), resumes)
+    assert summary.local == 1
+    assert summary.gemini_requests == 0
+    assert database.saved[0][1]["score"] == 0
+
+
+def test_fallback_budget_does_not_limit_local_work(job, resumes):
+    ambiguous = [{"fingerprint": str(i), "title": "Financial Analyst"} for i in range(3)]
+    database = FakeDatabase(ambiguous + [dict(job, fingerprint="local")])
+    matcher = FakeMatcher([MatchResult(score=60, category="business_analyst",
+                          matched_resume="data-analytics", relevant_skills=[], reason="Adjacent fit.")])
+    summary = process_pending_jobs(database, matcher, resumes, gemini_limit=1)
+    assert summary.gemini_requests == 1
+    assert summary.deferred == 2
+    assert summary.local == 1
+    assert summary.succeeded == 2
+    assert not database.errors
+
+
+def test_quota_error_stops_fallback_but_continues_local_work(job, resumes):
+    class QuotaError(RuntimeError):
+        code = 429
+    database = FakeDatabase([
+        {"fingerprint": "one", "title": "Financial Analyst"},
+        {"fingerprint": "two", "title": "Financial Analyst"},
+        dict(job, fingerprint="local"),
+    ])
+    summary = process_pending_jobs(database, FakeMatcher([QuotaError("quota")]), resumes)
+    assert summary.gemini_requests == 1
+    assert summary.failed == 1
+    assert summary.deferred == 1
+    assert summary.local == 1
+
+
+def test_local_matching_works_without_api_key(job, resumes, monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    database = FakeDatabase([dict(job, fingerprint="local"),
+                             {"fingerprint": "ambiguous", "title": "Financial Analyst"}])
+    summary = process_pending_jobs(database, None, resumes, gemini_limit=0)
+    assert summary.local == 1
+    assert summary.deferred == 1
+    assert not database.errors
+
+
+def test_quota_is_not_retried(job, resumes):
+    class QuotaError(RuntimeError):
+        code = 429
+    client = FakeClient([QuotaError("quota")])
+    matcher = GeminiMatcher(client=client, max_attempts=3)
+    with pytest.raises(QuotaError):
+        matcher.score_job(job, resumes)
+    assert client.models.calls == 1
+
+
+
+def test_existing_student_jobs_rejected_without_gemini(job, resumes):
+    database = FakeDatabase([dict(job, fingerprint="intern", title="Data Analyst Intern")])
+    summary = process_pending_jobs(database, FakeMatcher([]), resumes)
+    assert summary.local == 1
+    assert summary.gemini_requests == 0
+    assert database.saved[0][1]["score"] == 0

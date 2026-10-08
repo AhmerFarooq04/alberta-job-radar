@@ -127,11 +127,16 @@ NON_TARGET_CANADIAN_PROVINCES = (
 
 INTERNSHIP_TERMS = (
     "intern",
+    "interns",
     "internship",
+    "internships",
     "co-op",
     "coop",
     "co op",
     "student",
+    "students",
+    "cooperative education",
+    "co operative education",
     "summer student",
     "placement student",
 )
@@ -170,7 +175,7 @@ ENTRY_LEVEL_TERMS = (
 
 
 # ---------------------------------------------------------------------------
-# Titles we definitely want Gemini to inspect
+# Titles eligible for local matching or limited Gemini fallback
 # ---------------------------------------------------------------------------
 
 RELEVANT_TITLE_TERMS = (
@@ -525,11 +530,12 @@ def is_senior_role(title: str | None) -> bool:
     """
     Determine whether a title is clearly senior or managerial.
 
-    Explicit early-career wording wins. This prevents a title such as
-    "Associate Product Manager" from being rejected merely because it
-    includes the word "manager".
+    Associate/intern wording can override manager or architect, but never an
+    explicit senior, principal, staff, lead, or executive title.
     """
-    if is_entry_level_title(title):
+    if contains_term(title, ("senior", "sr", "principal", "director", "head of", "vice president", "vp", "chief", "lead", "staff")):
+        return True
+    if is_entry_level_title(title) or is_internship(title):
         return False
 
     return contains_term(title, SENIOR_LEVEL_TERMS)
@@ -537,8 +543,7 @@ def is_senior_role(title: str | None) -> bool:
 
 def has_relevant_title_signal(title: str | None) -> bool:
     """
-    Determine whether a title contains a role category we definitely want
-    Gemini to inspect.
+    Determine whether a title contains a plausible role category.
     """
     return contains_term(title, RELEVANT_TITLE_TERMS)
 
@@ -547,10 +552,15 @@ def is_clearly_unrelated_role(title: str | None) -> bool:
     """
     Determine whether a job is unmistakably outside the intended search.
 
-    Relevant signals take priority. Therefore, "Clinical Data Analyst"
-    remains eligible even though the job is related to medicine.
+    Analyst roles remain eligible across industries. A broad technology or
+    product keyword cannot rescue a clearly unrelated occupation.
     """
-    if has_relevant_title_signal(title):
+    # A technology keyword must not rescue a different occupation.
+    if contains_term(title, ("data entry", "product demonstrator", "production operator", "hardware design", "fpga", "electrical engineer", "mechanical engineer", "civil engineer", "mining engineer", "learning advisor")):
+        return True
+    if contains_term(title, ("analyst", "analytics")):
+        return False
+    if contains_term(title, ("software", "developer", "database")) and not contains_term(title, ("account executive", "sales representative", "talent acquisition", "recruiter")):
         return False
 
     return contains_term(
@@ -563,10 +573,11 @@ def is_target_role(title: str | None) -> bool:
     """
     Determine whether a title is plausible enough for Gemini.
 
-    This is an exclusion-based filter. Ambiguous jobs are retained.
+    Require a relevant title or a bounded adjacent title. Completed jobs also
+    need technical evidence for adjacent roles.
     """
     if not title or not title.strip():
-        return True
+        return False
 
     if is_senior_role(title):
         return False
@@ -574,7 +585,46 @@ def is_target_role(title: str | None) -> bool:
     if is_clearly_unrelated_role(title):
         return False
 
-    return True
+    return has_relevant_title_signal(title) or contains_term(title, (
+        "research coordinator", "technical documentation", "technical writer",
+        "security consultant", "digital", "technology", "it analyst", "it technician",
+    ))
+
+
+TECHNICAL_SKILLS = (
+    "python", "sql", "power bi", "excel", "power query", "power automate",
+    "javascript", "typescript", "java", "c++", "c#", "react", "node.js",
+    "postgresql", "linux", "windows", "docker", "git", "rest api",
+    "machine learning", "pandas", "numpy", "scikit learn", "aws", "azure",
+    "tableau", "etl", "vba", "networking", "troubleshooting", "requirements gathering",
+)
+
+
+def requires_excessive_experience(description: str | None) -> bool:
+    """Reject explicit mandatory 4+ year requirements, not preferred experience."""
+    for sentence in re.split(r"[\n.;]", description or ""):
+        text = normalize_text(sentence)
+        if contains_term(text, ("preferred", "asset", "nice to have", "ideally", "desirable")):
+            continue
+        if re.search(r"\b(?:minimum(?: of)?|at least|required|must have)\b", text):
+            for match in re.finditer(r"\b(\d+)\s*(?:\+|to \d+)?\s*years?\b", text):
+                if int(match.group(1)) >= 4:
+                    return True
+    return False
+
+
+def has_role_evidence(title: str | None, description: str | None) -> bool:
+    """Core titles qualify; broad/adjacent titles need technical duties."""
+    if contains_term(title, (
+        "analyst", "software", "developer", "programmer", "data analyst", "data scientist",
+        "data engineer", "business intelligence", "machine learning", "ai engineer",
+        "service desk", "help desk", "it support", "system administrator",
+        "systems analyst", "cybersecurity", "information security", "devops",
+        "power bi", "database", "it analyst", "it technician",
+    )):
+        return True
+    signals = sum(contains_term(description, (skill,)) for skill in TECHNICAL_SKILLS)
+    return signals >= 2
 
 
 def passes_prefilter_values(
@@ -612,15 +662,12 @@ def passes_prefilter(
     """
     Apply the prefilter to a completed Job object.
 
-    This filter only answers:
-
-        "Is this job plausible enough to send to Gemini?"
-
-    It does not determine whether the candidate is qualified.
+    Require role relevance and early-career suitability before matching.
+    This does not guarantee the candidate meets every qualification.
     """
     return passes_prefilter_values(
         title=job.title,
         location=job.location,
         employment_type=job.employment_type,
         include_internships=include_internships,
-    )
+    ) and has_role_evidence(job.title, job.description) and not requires_excessive_experience(job.description)

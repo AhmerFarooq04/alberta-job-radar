@@ -6,7 +6,6 @@ from pathlib import Path
 
 from job_radar.database import JobDatabase
 from job_radar.matcher import (
-    GeminiMatcher,
     MatchingRunResult,
     load_resumes,
     process_pending_jobs,
@@ -118,28 +117,26 @@ def main() -> None:
     cleaned_count = 0
 
     if database is not None:
-        if args.match:
-            try:
-                pending = database.get_jobs_for_matching(
+        # Local matching always runs on committed discoveries. --match enables
+        # only the small Gemini fallback budget.
+        try:
+            pending = database.get_jobs_for_matching(
+                retry_errors=True,
+                limit=args.match_limit,
+            )
+            if pending:
+                resumes = load_resumes(args.resumes)
+                matching = process_pending_jobs(
+                    database,
+                    None,
+                    resumes,
                     retry_errors=True,
                     limit=args.match_limit,
+                    gemini_limit=None if args.match else 0,
                 )
-                if pending:
-                    resumes = load_resumes(args.resumes)
-                    matcher = GeminiMatcher()
-                    try:
-                        matching = process_pending_jobs(
-                            database,
-                            matcher,
-                            resumes,
-                            retry_errors=True,
-                            limit=args.match_limit,
-                        )
-                    finally:
-                        matcher.close()
-            except Exception as error:
-                stage_failed = True
-                print(f"[MATCH STAGE ERROR] {type(error).__name__}")
+        except Exception as error:
+            stage_failed = True
+            print(f"[MATCH STAGE ERROR] {type(error).__name__}")
 
         if args.notify:
             try:
@@ -172,10 +169,12 @@ def main() -> None:
         print(f"Database run ID:      {result.database_run_id}")
         print(f"Old content cleaned:  {cleaned_count}")
 
-    if args.match:
-        print(f"Gemini jobs queued:   {matching.queued}")
-        print(f"Gemini jobs scored:   {matching.succeeded}")
-        print(f"Gemini jobs failed:   {matching.failed}")
+    if result.committed:
+        print(f"Matching jobs queued: {matching.queued}")
+        print(f"Locally resolved:     {matching.local}")
+        print(f"Gemini fallback jobs: {matching.gemini_requests}")
+        print(f"Matching deferred:    {matching.deferred}")
+        print(f"Matching failed:      {matching.failed}")
 
     if args.notify:
         print(f"Telegram queued:      {notifications.queued}")

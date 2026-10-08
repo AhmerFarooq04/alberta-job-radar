@@ -6,6 +6,7 @@ from job_radar.config import load_companies
 from job_radar.database import JobDatabase
 from job_radar.filters import passes_prefilter
 from job_radar.models import Job
+from job_radar.dates import is_expired
 from job_radar.scrapers import (
     SUPPORTED_ATS_TYPES,
     create_scraper,
@@ -106,6 +107,7 @@ def filter_jobs(
             job,
             include_internships=include_internships,
         )
+        and not is_expired(posted_at=job.posted_at, posted_text=job.posted_text)
     ]
 
 
@@ -179,6 +181,7 @@ def run_pipeline(
             else JobDatabase()
         )
         active_database.initialize()
+        active_database.delete_old_jobs()
         database_run_id = (
             active_database.start_pipeline_run()
         )

@@ -2,6 +2,7 @@ import requests
 
 from job_radar.filters import passes_prefilter_values
 from job_radar.models import Job
+from job_radar.dates import parse_posted_date
 from job_radar.scrapers.base import BaseScraper, html_to_text
 
 
@@ -93,6 +94,7 @@ class CollageScraper(BaseScraper):
                     ),
                     job_url=url,
                     source="collage",
+                    posted_at=parse_posted_date(posting.get("publishedAt") or posting.get("datePosted")),
                     employment_type=employment_type,
                     workplace_type=posting.get(
                         "workplaceType"

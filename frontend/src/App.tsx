@@ -11,6 +11,7 @@ const columns = [
 ] as const;
 
 type Category = (typeof columns)[number]["id"];
+const PAGE_SIZE = 4;
 
 type Job = {
   fingerprint: string;
@@ -125,7 +126,10 @@ function JobCard({ job }: { job: Job }) {
 
   const contents = (
     <>
-      <h3>{job.title}</h3>
+      <span className="score-dot" title={matchLabel(job)}>
+        <span className="sr-only">{matchLabel(job)}</span>
+      </span>
+      <h3 title={job.title}>{job.title}</h3>
       <div className="card-footer">
         <span className="company" title={job.company_name}>
           {job.company_name}
@@ -169,6 +173,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const [visibleCounts, setVisibleCounts] = useState<Partial<Record<Category, number>>>({});
 
   useEffect(() => {
     const controller = new AbortController();
@@ -178,6 +183,7 @@ export default function App() {
     setLoading(true);
     setError("");
     setJobs([]);
+    setVisibleCounts({});
 
     const timeout = window.setTimeout(() => {
       timedOut = true;
@@ -227,6 +233,20 @@ export default function App() {
 
   return (
     <main className="app">
+      <div className="starfield" aria-hidden="true">
+        {Array.from({ length: 9 }, (_, index) => (
+          <span
+            className="falling-star"
+            key={index}
+            style={{
+              left: `${8 + index * 11}%`,
+              top: `${(index * 17) % 65}%`,
+              animationDelay: `${index * 1.7}s`,
+              animationDuration: `${9 + (index % 3) * 2}s`,
+            }}
+          />
+        ))}
+      </div>
       <header className="toolbar">
         <h1>
           <svg
@@ -274,6 +294,8 @@ export default function App() {
       <div className="board" aria-busy={loading}>
         {columns.map((column) => {
           const items = jobs.filter((job) => categoryOf(job) === column.id);
+          const visibleCount = visibleCounts[column.id] ?? PAGE_SIZE;
+          const remaining = Math.max(0, items.length - visibleCount);
 
           return (
             <section
@@ -294,9 +316,22 @@ export default function App() {
                 ) : items.length === 0 ? (
                   <p className="empty">No new jobs</p>
                 ) : (
-                  items.map((job) => (
+                  items.slice(0, visibleCount).map((job) => (
                     <JobCard key={job.fingerprint} job={job} />
                   ))
+                )}
+                {!loading && !error && remaining > 0 && (
+                  <button
+                    className="load-more"
+                    type="button"
+                    aria-label={`Load ${Math.min(PAGE_SIZE, remaining)} more ${column.label} jobs`}
+                    onClick={() => setVisibleCounts((counts) => ({
+                      ...counts,
+                      [column.id]: visibleCount + PAGE_SIZE,
+                    }))}
+                  >
+                    Load more <span>({remaining} remaining)</span>
+                  </button>
                 )}
               </div>
             </section>

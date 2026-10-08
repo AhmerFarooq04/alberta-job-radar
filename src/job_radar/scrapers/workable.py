@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 import requests
 
@@ -8,16 +7,7 @@ from job_radar.models import Job
 from job_radar.scrapers.base import BaseScraper
 
 
-def parse_date(value):
-    if not value:
-        return None
-
-    try:
-        return datetime.fromisoformat(
-            value.replace("Z", "+00:00")
-        )
-    except ValueError:
-        return None
+from job_radar.dates import parse_posted_date as parse_date
 
 
 def markdown_to_text(value):

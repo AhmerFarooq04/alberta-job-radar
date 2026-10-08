@@ -224,3 +224,46 @@ def test_invalid_requests(setup):
         "/api/jobs/missing",
         json={"category": "it_systems"},
     ).status_code == 404
+
+
+def test_historical_irrelevant_jobs_hidden_without_deleting(setup):
+    client, database = setup
+    fingerprint = add_job(database, "old-irrelevant")
+    with database.connect() as connection:
+        connection.execute("UPDATE jobs SET title = ? WHERE fingerprint = ?",
+                           ("Learning Advisor", fingerprint))
+    assert client.get("/api/jobs").json()["total"] == 0
+    assert database.get_job(fingerprint) is not None
+
+
+def test_local_rejections_hidden_but_low_gemini_scores_remain(setup):
+    client, database = setup
+    fingerprint = add_job(database, "local-reject")
+    add_job(database, "weak-match", score=20)
+    database.save_match_result(fingerprint, score=0, category="data_analytics",
+                              matched_resume="data-analytics", relevant_skills=[],
+                              reason="Local rules: Outside scope.", qualified=False)
+    assert client.get("/api/jobs").json()["total"] == 1
+
+
+
+def test_api_permanently_deletes_expired_postings(setup):
+    client, database = setup
+    fingerprint = add_job(database, "expired")
+    add_job(database, "recent")
+    with database.connect() as connection:
+        connection.execute("UPDATE jobs SET posted_at = ? WHERE fingerprint = ?",
+                           ("2026-07-16", fingerprint))
+    assert client.get("/api/jobs").json()["total"] == 1
+    assert database.get_job(fingerprint) is None
+
+
+
+def test_existing_student_jobs_hidden_from_pool(setup):
+    client, database = setup
+    for index, title in enumerate(("Data Analyst Co-op", "Software Developer Intern", "IT Student")):
+        fingerprint = add_job(database, str(index))
+        with database.connect() as connection:
+            connection.execute("UPDATE jobs SET title = ? WHERE fingerprint = ?", (title, fingerprint))
+    add_job(database, "regular")
+    assert client.get("/api/jobs").json()["total"] == 1

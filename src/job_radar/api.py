@@ -14,6 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
 
 from job_radar.database import JobDatabase, datetime_to_text
+from job_radar.dates import parse_posted_date, posting_date_text
+from job_radar.filters import passes_prefilter_values, has_role_evidence, requires_excessive_experience
 
 
 Category = Literal[
@@ -65,6 +67,7 @@ JOB_SELECT = """
         j.company_name,
         j.title,
         j.location,
+        j.description,
         j.job_url,
         j.posted_at,
         j.posted_text,
@@ -97,6 +100,10 @@ JOB_SELECT = """
 
 def serialize_job(row) -> dict:
     job = dict(row)
+    job.pop("description", None)
+    if not job["posted_at"]:
+        job["posted_at"] = posting_date_text(parse_posted_date(
+            job["posted_text"], reference=parse_posted_date(job["last_seen_at"])))
     job["is_baseline"] = bool(job["is_baseline"])
     job["relevant_skills"] = json.loads(
         job["relevant_skills"] or "[]"
@@ -172,6 +179,7 @@ def create_app(
         include_baseline: bool = False,
     ):
         now = current_time()
+        database.delete_old_jobs(current_time=now)
         start = period_start(period, now)
 
         sql = JOB_SELECT + """
@@ -201,7 +209,14 @@ def create_app(
                 parameters,
             ).fetchall()
 
-        jobs = [serialize_job(row) for row in rows]
+        # Reapply current rules to historical discoveries without deleting data.
+        jobs = [serialize_job(row) for row in rows
+                if passes_prefilter_values(row["title"], row["location"],
+                                           row["employment_type"], include_internships=False)
+                and has_role_evidence(row["title"], row["description"])
+                and not requires_excessive_experience(row["description"])
+                and not (row["match_score"] == 0
+                         and (row["match_reason"] or "").startswith("Local rules:"))]
 
         return {
             "period": period,

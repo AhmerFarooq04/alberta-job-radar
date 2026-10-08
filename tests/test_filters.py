@@ -280,12 +280,14 @@ def test_complete_prefilter_accepts_relevant_job() -> None:
     assert passes_prefilter(job)
 
 
-def test_complete_prefilter_accepts_ambiguous_job() -> None:
+def test_complete_prefilter_requires_evidence_for_adjacent_job() -> None:
     job = make_job(
         title="Research Coordinator",
         location="Edmonton, Alberta",
     )
 
+    assert not passes_prefilter(job)
+    job.description = "Analyze research datasets using Python and SQL."
     assert passes_prefilter(job)
 
 
@@ -353,3 +355,44 @@ def test_raw_value_prefilter_respects_internship_setting() -> None:
         employment_type="Intern",
         include_internships=True,
     )
+
+
+def test_strict_title_and_seniority_guards():
+    for title in ("", "Learning Advisor", "FPGA Digital Design Engineering Intern",
+                  "Data Entry Clerk", "Senior Associate Software Developer",
+                  "Registered Nurse - Digital Health", "Product Sales Representative"):
+        assert not is_target_role(title), title
+    assert is_target_role("Associate Product Manager")
+    assert is_target_role("Product Manager Intern")
+    assert is_target_role("Financial Analyst")
+
+
+def test_product_and_project_roles_require_technical_evidence():
+    job = make_job(title="Project Coordinator Intern")
+    job.description = "Coordinate site construction and materials deliveries."
+    assert not passes_prefilter(job, include_internships=True)
+    job.description = "Gather requirements and build reports using SQL and Python."
+    assert passes_prefilter(job, include_internships=True)
+
+
+def test_required_experience_is_distinct_from_preferred_experience():
+    job = make_job(title="Software Developer")
+    job.description = "Must have at least 5 years of software development experience."
+    assert not passes_prefilter(job)
+    job.description = "5 years of experience preferred. Python and SQL."
+    assert passes_prefilter(job)
+
+
+def test_all_analyst_roles_are_kept_without_technical_keywords():
+    for title in ("Financial Analyst", "Recovery Analyst", "Sales Operations Analyst"):
+        assert passes_prefilter(make_job(title=title))
+
+
+
+def test_student_positions_excluded_but_regular_graduate_jobs_kept():
+    for title in ("Software Developer Intern", "Data Analyst Co-op",
+                  "Data Analyst Coop", "IT Summer Student", "Analyst - Students"):
+        assert not passes_prefilter(make_job(title=title))
+    assert not passes_prefilter(make_job(title="Data Analyst", employment_type="Internship"))
+    for title in ("Junior Data Analyst", "New Graduate Software Developer", "Associate Software Developer"):
+        assert passes_prefilter(make_job(title=title))

@@ -14,6 +14,10 @@ from google.genai import errors, types
 from pydantic import BaseModel, Field, ValidationError
 
 from job_radar.database import JobDatabase
+from job_radar.filters import (
+    TECHNICAL_SKILLS, contains_term, has_role_evidence, is_entry_level_title,
+    is_internship, is_target_role, is_target_location, requires_excessive_experience,
+)
 
 
 JobCategory = Literal[
@@ -43,10 +47,68 @@ class MatchingRunResult:
     queued: int
     succeeded: int
     failed: int
+    local: int = 0
+    gemini_requests: int = 0
+    deferred: int = 0
 
 
 class MatchResponseError(RuntimeError):
     pass
+
+
+def local_match(job: Mapping[str, Any], resumes: Mapping[str, str]) -> MatchResult | None:
+    """Return an explainable rules result, or None for genuine uncertainty.
+
+    Scores describe resume overlap, not a probability of being hired.
+    """
+    if not resumes:
+        raise ValueError("At least one resume is required")
+    title = str(job.get("title") or "")
+    description = str(job.get("description") or "")
+    category: JobCategory = "tech_adjacent_other"
+    preferred = ""
+    if contains_term(title, ("software", "developer", "programmer", "embedded", "qa", "test engineer")):
+        category, preferred = "software_development", "software"
+    elif contains_term(title, ("data", "analytics", "business intelligence", "reporting", "machine learning", "ai engineer", "ml engineer", "power bi", "insights")):
+        category, preferred = "data_analytics", "ai-ml" if contains_term(title, ("machine learning", "ai", "ml")) else "data-analytics"
+    elif contains_term(title, ("it", "systems", "system", "network", "cloud", "devops", "security", "support", "service desk", "help desk", "infrastructure")):
+        category, preferred = "it_systems", "automation-it"
+    elif contains_term(title, ("analyst", "business", "product", "project")):
+        category, preferred = "business_analyst", "data-analytics"
+
+    overlaps = {
+        name: [skill for skill in TECHNICAL_SKILLS
+               if contains_term(description, (skill,)) and contains_term(content, (skill,))]
+        for name, content in resumes.items()
+    }
+    best = max(resumes, key=lambda name: (len(overlaps[name]), name == preferred))
+    skills = overlaps[best]
+    rejection = None
+    if is_internship(title, job.get("employment_type")):
+        rejection = "Internship, co-op, or student position"
+    elif not is_target_role(title):
+        rejection = "Unrelated, missing, or senior title"
+    elif not is_target_location(job.get("location")):
+        rejection = "Outside target locations"
+    elif requires_excessive_experience(description):
+        rejection = "Explicit mandatory experience exceeds early-career scope"
+    elif not has_role_evidence(title, description):
+        rejection = "Adjacent role lacks evidence of technical duties"
+    if rejection:
+        return MatchResult(score=0, category=category, matched_resume=best,
+                           relevant_skills=[], reason=f"Local rules: {rejection}.")
+
+    # An empty description needs inspection; an analyst title alone is enough
+    # to retain a role, but not enough to assert resume fit.
+    if len(skills) < 2 or category == "tech_adjacent_other":
+        return None
+    early = is_entry_level_title(title) or is_internship(title, job.get("employment_type"))
+    score = min(95, 55 + 7 * min(len(skills), 5) + (8 if early else 0))
+    return MatchResult(score=score, category=category, matched_resume=best,
+                       relevant_skills=skills[:8],
+                       reason=f"Local rules: {len(skills)} shared skills; "
+                              f"{'explicit early-career title' if early else 'no explicit senior title'}. "
+                              "Heuristic resume overlap, not an eligibility guarantee.")
 
 
 SYSTEM_INSTRUCTION = """
@@ -174,7 +236,7 @@ class GeminiMatcher:
             else int(
                 os.getenv(
                     "GEMINI_MAX_ATTEMPTS",
-                    "3",
+                    "1",
                 )
             )
         )
@@ -260,6 +322,7 @@ class GeminiMatcher:
 
                 if (
                     attempt >= self.max_attempts
+                    or getattr(error, "code", None) == 429
                     or not self._is_retryable(error)
                 ):
                     raise
@@ -366,12 +429,14 @@ class GeminiMatcher:
 
 def process_pending_jobs(
     database: JobDatabase,
-    matcher: GeminiMatcher,
+    matcher: GeminiMatcher | None,
     resumes: Mapping[str, str],
     *,
     threshold: float | None = None,
     retry_errors: bool = True,
     limit: int | None = None,
+    local_first: bool = True,
+    gemini_limit: int | None = None,
 ) -> MatchingRunResult:
     load_dotenv()
 
@@ -397,17 +462,40 @@ def process_pending_jobs(
         limit=limit,
     )
 
+    budget = gemini_limit if gemini_limit is not None else int(os.getenv("GEMINI_FALLBACK_LIMIT", "2"))
+    if budget < 0:
+        raise ValueError("Gemini fallback limit must be nonnegative")
     succeeded = 0
     failed = 0
+    local = 0
+    requests = 0
+    deferred = 0
+    provider_unavailable = False
+    owned_matcher = None
 
     for job in jobs:
         fingerprint = job["fingerprint"]
 
         try:
-            result = matcher.score_job(
-                job,
-                resumes,
-            )
+            result = local_match(job, resumes) if local_first else None
+            if result is not None:
+                local += 1
+            else:
+                if requests >= budget or provider_unavailable:
+                    deferred += 1
+                    continue
+                if matcher is None:
+                    if not os.getenv("GEMINI_API_KEY"):
+                        deferred += 1
+                        continue
+                    if owned_matcher is None:
+                        owned_matcher = GeminiMatcher(max_attempts=1)
+                    active_matcher = owned_matcher
+                else:
+                    active_matcher = matcher
+                requests += 1
+                result = active_matcher.score_job(job, resumes)
+                result.reason = "Gemini fallback: " + result.reason[:480]
 
             database.save_match_result(
                 fingerprint,
@@ -429,6 +517,8 @@ def process_pending_jobs(
             succeeded += 1
 
         except Exception as error:
+            if getattr(error, "code", None) == 429:
+                provider_unavailable = True
             database.record_match_error(
                 fingerprint,
                 (
@@ -439,8 +529,13 @@ def process_pending_jobs(
 
             failed += 1
 
+    if owned_matcher is not None:
+        owned_matcher.close()
     return MatchingRunResult(
         queued=len(jobs),
         succeeded=succeeded,
         failed=failed,
+        local=local,
+        gemini_requests=requests,
+        deferred=deferred,
     )

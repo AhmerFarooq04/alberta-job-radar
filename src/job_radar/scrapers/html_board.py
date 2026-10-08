@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from job_radar.filters import passes_prefilter_values
 from job_radar.models import Job
+from job_radar.dates import extract_html_posted_date
 from job_radar.scrapers.base import BaseScraper, html_to_text
 
 
@@ -175,6 +176,7 @@ class HtmlBoardScraper(BaseScraper):
             ),
             job_url=response.url,
             source="html_board",
+            posted_at=extract_html_posted_date(soup),
             employment_type=employment_type,
         )
 

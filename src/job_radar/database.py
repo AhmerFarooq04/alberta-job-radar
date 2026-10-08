@@ -11,6 +11,7 @@ from urllib.parse import urlsplit, urlunsplit
 from contextlib import contextmanager
 
 from job_radar.models import Job
+from job_radar.dates import parse_posted_date, posting_date_text, is_expired
 
 
 GEMINI_BASELINE = "baseline"
@@ -400,9 +401,11 @@ class JobDatabase:
         timestamp = datetime_to_text(
             seen_at or utc_now()
         )
-        posted_at = datetime_to_text(
-            job.posted_at
-        )
+        posted_date = job.posted_at or parse_posted_date(job.posted_text, reference=seen_at or utc_now())
+        posted_at = posting_date_text(posted_date)
+        if is_expired(posted_at=posted_date, posted_text=job.posted_text,
+                      first_seen_at=seen_at or utc_now(), now=seen_at or utc_now()):
+            return False
         fingerprint = make_job_fingerprint(
             job
         )
@@ -479,10 +482,11 @@ class JobDatabase:
                         END,
                         job_url = ?,
                         source = ?,
-                        posted_at = COALESCE(
-                            ?,
-                            posted_at
-                        ),
+                        posted_at = CASE
+                            WHEN ? IS NULL THEN posted_at
+                            WHEN posted_at IS NULL THEN ?
+                            ELSE MIN(posted_at, ?)
+                        END,
                         posted_text = COALESCE(
                             ?,
                             posted_text
@@ -507,6 +511,8 @@ class JobDatabase:
                         job.description,
                         job.job_url,
                         job.source,
+                        posted_at,
+                        posted_at,
                         posted_at,
                         job.posted_text,
                         job.employment_type,
@@ -738,6 +744,19 @@ class JobDatabase:
                     "Unknown job fingerprint: "
                     f"{fingerprint}"
                 )
+
+    def delete_old_jobs(self, *, current_time: datetime | None = None) -> int:
+        """Permanently remove jobs at least two calendar months old."""
+        now = current_time or utc_now()
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT fingerprint, posted_at, posted_text, first_seen_at, last_seen_at FROM jobs"
+            ).fetchall()
+            expired = [row["fingerprint"] for row in rows if is_expired(
+                posted_at=row["posted_at"], posted_text=row["posted_text"],
+                first_seen_at=row["first_seen_at"], last_seen_at=row["last_seen_at"], now=now)]
+            connection.executemany("DELETE FROM jobs WHERE fingerprint = ?", [(key,) for key in expired])
+        return len(expired)
 
     def cleanup_old_content(
         self,
